@@ -14,32 +14,27 @@ func init() {
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		static := "static" + r.URL.Path
-		log.Printf("'%s', '%s'\n", r.URL.Path, static)
+		log.Printf("'%s','%s', '%s'\n", remoteAddr(r), r.URL.Path, static)
 		http.ServeFile(w, r, static)
 	})
-	// 路由与视图函数绑定
+
 	http.HandleFunc("/mobileAddress", mobileAddressHandler)
 
-	// 启动服务,监听地址
-	err := http.ListenAndServe(":80", nil)
-	if err == nil {
-		return
+	ports := []string{"8080", "9999"}
+	var err error
+	for _, v := range ports {
+		err = http.ListenAndServe(":"+v, nil)
+		if err != nil {
+			log.Printf("'%s' 监听失败\b", v)
+		}
 	}
-	err = http.ListenAndServe(":8080", nil)
-	if err == nil {
-		return
-	}
-	err = http.ListenAndServe(":9999", nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	log.Fatal(err)
 }
 
 func mobileAddressHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	phone := r.FormValue("phone")
-	log.Println("phone number", phone)
+	log.Printf("'%s','%s', '%s'\n", remoteAddr(r), r.URL.Path, phone)
 
 	address := QueryMobile(phone)
 	data, err := json.Marshal(address)
@@ -56,4 +51,15 @@ func mobileAddressHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println("reponse err ", err)
 	}
+}
+
+// proxy_set_header X-Real-IP $remote_addr;
+// proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+func remoteAddr(r *http.Request) string {
+	header := r.Header
+	remoteAddr := header.Get("X-Forwarded-For")
+	if remoteAddr != "" {
+		return remoteAddr
+	}
+	return r.RemoteAddr
 }
