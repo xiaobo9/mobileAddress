@@ -22,9 +22,9 @@ FROM scratch
 
 WORKDIR /
 
-COPY --from=build /mobileAddress /mobileAddress
 COPY data /data
 COPY static /static
+COPY --from=build /mobileAddress /mobileAddress
 
 EXPOSE 8080
 
