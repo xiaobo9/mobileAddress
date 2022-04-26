@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="zh">
+    <title>手机号码归属地查询</title>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <div>
+        <input id="phoneNumber" name="phoneNumber" placeholder="12345678901" />
+        <input type="button" onclick="query()" value="查询" />
+    </div>
+    <div>
+        <span>结果</span><span id="result"></span>
+    </div>
+    <script type="text/javascript">
+        function query() {
+            ajaxGet('/mobileAddress?phone=' + el('phoneNumber').value, function (result) {
+                el('result').textContent = result;
+            })
+        }
+        function el(id) {
+            return document.getElementById(id)
+        }
+        function ajaxGet(url, endFunc) {
+            let ajax = new XMLHttpRequest();
+            ajax.open('get', url);
+            ajax.send();
+            ajax.onreadystatechange = function () {
+                if (ajax.readyState == 4) {
+                    endFunc(ajax.responseText)
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
