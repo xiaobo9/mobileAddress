@@ -49,7 +49,7 @@ func mobileAddressHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	_, err = io.WriteString(w, string(data))
 	if err != nil {
-		log.Println("reponse err ", err)
+		log.Println("response err ", err)
 	}
 }
 
